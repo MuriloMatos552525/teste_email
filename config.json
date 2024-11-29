@@ -1,0 +1,10 @@
+{
+    "SECRET_KEY": "uma_chave_secreta_segura_aqui",
+    "DB_SERVER": "balzani-realtime-email-service.database.windows.net",
+    "DB_NAME": "realtime_email_service",
+    "DB_USER": "admin-balzani",
+    "DB_PASSWORD": "Adm@2024",
+    "ALGORITHM": "HS256",
+    "ACCESS_TOKEN_EXPIRE_MINUTES": 30,
+    "DB_DRIVER": "ODBC Driver 17 for SQL Server"
+}
