@@ -4,5 +4,5 @@ SQLAlchemy==1.4.46
 python-jose==3.3.0
 passlib==1.7.4  # Inclui suporte ao bcrypt para senhas
 python-multipart==0.0.5
-pyodbc==4.0.34  # Compatível com Python 3.11
+pyodbc==5.2.0  # Compatível com Python 3.11
 pydantic==1.10.9  # Para validações no FastAPI
