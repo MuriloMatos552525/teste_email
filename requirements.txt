@@ -1,0 +1,7 @@
+fastapi==0.95.2
+uvicorn==0.22.0
+SQLAlchemy==1.4.46
+python-jose==3.4.0
+passlib==1.7.4
+python-multipart==0.0.5
+pyodbc==4.0.35
