@@ -24,7 +24,7 @@ app = FastAPI()
 # Configuração do CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Altere para a origem do seu front-end
+    allow_origins=["https://realtime-email-frontend.vercel.app"],  # Altere para a origem do seu front-end
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
