@@ -26,6 +26,7 @@ class MessageCreate(MessageBase):
 class Message(MessageBase):
     id: int
     sender_id: int
+    sender_username: str  # Adicionado
     timestamp: datetime
     is_read: bool
 

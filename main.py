@@ -1,3 +1,4 @@
+# main.py
 from collections import defaultdict
 from datetime import timedelta
 from typing import List
@@ -98,6 +99,8 @@ async def send_message(
     if recipient is None:
         raise HTTPException(status_code=404, detail="Destinatário não encontrado")
     db_message = crud.create_message(db=db, message=message, sender_id=current_user.id)
+    db_message.sender_username = current_user.username  # Adicionado
+
     # Enviar notificação se o destinatário estiver conectado
     if recipient.username in active_connections:
         unread_count = crud.get_unread_count(db, recipient.id)
@@ -106,6 +109,7 @@ async def send_message(
             "message": {
                 "id": db_message.id,
                 "sender_id": db_message.sender_id,
+                "sender_username": db_message.sender_username,  # Adicionado
                 "title": db_message.title,
                 "timestamp": db_message.timestamp.isoformat(),
                 "unread_count": unread_count,
@@ -124,7 +128,10 @@ def read_inbox(
     """
     Rota para obter as mensagens recebidas.
     """
-    return crud.get_inbox(db=db, user_id=current_user.id)
+    messages = crud.get_inbox(db=db, user_id=current_user.id)
+    for message in messages:
+        message.sender_username = message.sender.username  # Adicionado
+    return messages
 
 # Rota para obter as mensagens enviadas (outbox)
 @app.get("/messages/outbox/", response_model=List[schemas.Message])
@@ -135,7 +142,10 @@ def read_outbox(
     """
     Rota para obter as mensagens enviadas.
     """
-    return crud.get_outbox(db=db, user_id=current_user.id)
+    messages = crud.get_outbox(db=db, user_id=current_user.id)
+    for message in messages:
+        message.sender_username = current_user.username  # Adicionado
+    return messages
 
 # Rota para marcar uma mensagem como lida
 @app.put("/messages/{message_id}/read")
@@ -163,10 +173,16 @@ async def mark_as_read(
 
 # Endpoint WebSocket para notificações em tempo real
 @app.websocket("/ws/")
-async def websocket_endpoint(websocket: WebSocket, token: str):
+async def websocket_endpoint(websocket: WebSocket):
     """
     Endpoint WebSocket com autenticação via token JWT.
     """
+    await websocket.accept()
+    token = websocket.query_params.get('token')
+    if token is None:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
     try:
         # Autentica o usuário via token JWT
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -178,7 +194,6 @@ async def websocket_endpoint(websocket: WebSocket, token: str):
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
-    await websocket.accept()
     active_connections[username].append(websocket)
     try:
         while True:
